@@ -22,6 +22,14 @@ const App: React.FC = () => {
   const handleWaypointEnterhairColor = () => sethaircolor(hairColor.concat(objectCopy(parts.hairColor)));
   const objectCopy = (obj: any) => JSON.parse(JSON.stringify(obj));
 
+  const isSmartPhone = (() => {
+    if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
+      return true;
+    } else {
+      return false;
+    }
+  })();
+
   // 選択中の情報
   const [selectHairStyle, setselectHairStyle] = React.useState<Part>({ name: '', img: '', description: '' });
   const [selectHairColor, setselectHairColor] = React.useState<Part>({ name: '', img: '', description: '' });
@@ -58,47 +66,60 @@ const App: React.FC = () => {
     createA4PrintImage(config as Config, selectHairStyle.img, selectBang.img, selectHairColor.img);
   }, [selectHairColor, selectHairStyle, selectBang]);
 
-  const hairStyleComponent = hairStyle
-    .map((item, key) => (
+  const hairStyleComponent = () => {
+    const dom = hairStyle.map((item, key) => (
       <div key={key} onClick={clickHairStyle(item)}>
         <div style={{ width: 100 }}>
           <img src={item.img} height={150} />
         </div>
       </div>
-    ))
-    .concat(<Waypoint key={-1} horizontal onEnter={handleWaypointEnterhairStyle} />);
+    ));
 
-  const bangComponent = bangs
-    .map((item, key) => (
+    if (isSmartPhone) {
+      dom.concat(<Waypoint key={-1} horizontal onEnter={handleWaypointEnterhairStyle} />);
+    }
+    return dom;
+  };
+
+  const bangComponent = () => {
+    const dom = bangs.map((item, key) => (
       <div key={key} onClick={() => setselectBang(item)}>
         <div style={{ width: 100 }}>
           <img src={item.img} height={150} />
         </div>
       </div>
-    ))
-    .concat(<Waypoint key={-1} horizontal onEnter={handleWaypointEnterBangs} />);
+    ));
+    if (isSmartPhone) {
+      dom.concat(<Waypoint key={-1} horizontal onEnter={handleWaypointEnterBangs} />);
+    }
+    return dom;
+  };
 
-  const hairColorComponent = hairColor
-    .map((item, key) => (
+  const hairColorComponent = () => {
+    const dom = hairColor.map((item, key) => (
       <div key={key} onClick={() => setselectHairColor(item)}>
         <div style={{ width: 100 }}>
           <img src={item.img} height={150} />
         </div>
       </div>
-    ))
-    .concat(<Waypoint key={-1} horizontal onEnter={handleWaypointEnterhairColor} />);
+    ));
+    if (isSmartPhone) {
+      dom.concat(<Waypoint key={-1} horizontal onEnter={handleWaypointEnterhairColor} />);
+    }
+    return dom;
+  };
 
   return (
     <div>
       <div className={'SW-update-dialog'} />
       <div style={{ backgroundColor: 'white' }}>
-        <canvas id="mychara1" width={window.innerWidth - 30} /> <canvas id="mychara2" width={window.innerWidth - 30} />
+        <canvas id="mychara1" width={300} /> <canvas id="mychara2" width={300} />
       </div>
       {/* ヘアスタイル */}
-      <div style={{ display: 'flex', overflowX: 'auto' }}>{hairStyleComponent}</div>
-      <div style={{ display: 'flex', overflowX: 'auto' }}>{bangComponent}</div>
+      <div style={{ display: 'flex', overflowX: 'auto' }}>{hairStyleComponent()}</div>
+      <div style={{ display: 'flex', overflowX: 'auto' }}>{bangComponent()}</div>
       {/* ヘアカラー */}
-      <div style={{ display: 'flex', overflowX: 'auto' }}>{hairColorComponent}</div>
+      <div style={{ display: 'flex', overflowX: 'auto' }}>{hairColorComponent()}</div>
     </div>
   );
 };
