@@ -143,7 +143,7 @@ const createCanvas = async (canvas: HTMLCanvasElement, config: Config, hairStyle
   await loadImage(hairStyleImage);
 
   // ヘアスタイル画像
-  ctx.drawImage(hairStyleImage, 0, 0);
+  ctx.drawImage(hairStyleImage, 10, 10);
 
   if (!hairColor) return;
 
@@ -186,7 +186,6 @@ const createCanvas = async (canvas: HTMLCanvasElement, config: Config, hairStyle
       imageData.data[i * 4 + 1] = colors.color1[1];
       imageData.data[i * 4 + 2] = colors.color1[2];
       imageData.data[i * 4 + 3] = colors.color1[3];
-      console.log(i);
     }
 
     if (color2List.includes(i)) {
@@ -194,7 +193,6 @@ const createCanvas = async (canvas: HTMLCanvasElement, config: Config, hairStyle
       imageData.data[i * 4 + 1] = colors.color2[1];
       imageData.data[i * 4 + 2] = colors.color2[2];
       imageData.data[i * 4 + 3] = colors.color2[3];
-      console.log(i);
     }
   }
   ctx.putImageData(imageData, 0, 0);

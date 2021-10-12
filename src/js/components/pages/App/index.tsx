@@ -67,7 +67,7 @@ const App: React.FC = () => {
   }, [selectHairColor, selectHairStyle, selectBang]);
 
   const hairStyleComponent = () => {
-    const dom = hairStyle.map((item, key) => (
+    let dom = hairStyle.map((item, key) => (
       <div key={key} onClick={clickHairStyle(item)}>
         <div style={{ width: 100 }}>
           <img src={item.img} height={150} />
@@ -76,13 +76,13 @@ const App: React.FC = () => {
     ));
 
     if (isSmartPhone) {
-      dom.concat(<Waypoint key={-1} horizontal onEnter={handleWaypointEnterhairStyle} />);
+      dom = dom.concat(<Waypoint key={-1} horizontal onEnter={handleWaypointEnterhairStyle} />);
     }
     return dom;
   };
 
   const bangComponent = () => {
-    const dom = bangs.map((item, key) => (
+    let dom = bangs.map((item, key) => (
       <div key={key} onClick={() => setselectBang(item)}>
         <div style={{ width: 100 }}>
           <img src={item.img} height={150} />
@@ -90,13 +90,13 @@ const App: React.FC = () => {
       </div>
     ));
     if (isSmartPhone) {
-      dom.concat(<Waypoint key={-1} horizontal onEnter={handleWaypointEnterBangs} />);
+      dom = dom.concat(<Waypoint key={-1} horizontal onEnter={handleWaypointEnterBangs} />);
     }
     return dom;
   };
 
   const hairColorComponent = () => {
-    const dom = hairColor.map((item, key) => (
+    let dom = hairColor.map((item, key) => (
       <div key={key} onClick={() => setselectHairColor(item)}>
         <div style={{ width: 100 }}>
           <img src={item.img} height={150} />
@@ -104,7 +104,7 @@ const App: React.FC = () => {
       </div>
     ));
     if (isSmartPhone) {
-      dom.concat(<Waypoint key={-1} horizontal onEnter={handleWaypointEnterhairColor} />);
+      dom = dom.concat(<Waypoint key={-1} horizontal onEnter={handleWaypointEnterhairColor} />);
     }
     return dom;
   };
@@ -112,8 +112,9 @@ const App: React.FC = () => {
   return (
     <div>
       <div className={'SW-update-dialog'} />
-      <div style={{ backgroundColor: 'white' }}>
-        <canvas id="mychara1" width={300} /> <canvas id="mychara2" width={300} />
+      <div style={{ backgroundColor: 'white', height: 200, display: 'flex' }}>
+        <canvas id="mychara1" height={200} width={200} style={{ marginRight: 40, marginLeft: 10 }} />
+        <canvas id="mychara2" height={200} width={200} />
       </div>
       {/* ヘアスタイル */}
       <div style={{ display: 'flex', overflowX: 'auto' }}>{hairStyleComponent()}</div>
