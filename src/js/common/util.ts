@@ -1,4 +1,39 @@
-import { Config } from '../types/global';
+import { Config, PartsData } from '../types/global';
+
+export const partsJsonToTool = (json: any[]): PartsData => {
+  const hairColor = json
+    .filter((item) => item.categoryName === 'ヘアカラー')
+    .map((item) => {
+      return {
+        name: item.partsName,
+        img: `https://cdn.primagi.jp/assets/images/parts/thumb/img_${item.id}.png`,
+      };
+    });
+
+  const hairStyle = json
+    .filter((item) => item.categoryName === 'ヘアスタイル')
+    .map((item) => {
+      return {
+        name: item.partsName,
+        img: `https://cdn.primagi.jp/assets/images/parts/thumb/img_${item.id}.png`,
+      };
+    });
+
+  const bangs = json
+    .filter((item) => item.categoryName === 'まえがみ')
+    .map((item) => {
+      return {
+        name: item.partsName,
+        img: `https://cdn.primagi.jp/assets/images/parts/thumb/img_${item.id}.png`,
+      };
+    });
+
+  return {
+    hairColor,
+    hairStyle,
+    bangs,
+  };
+};
 
 /**
  * CORS回避画像の取得
@@ -33,55 +68,6 @@ const fetchPngImageAvoidCors = async (imageurl: string) => {
   }
 };
 
-/**
- * 回転させた画像をcanvasに表示する
- * @param image - Imageオブジェクト
- * @param x - 画像の中心となるX座標
- * @param y - 画像の中心となるY座標
- * @param angle - 回転する角度[度]
- */
-const drawRotatedImage = (context: CanvasRenderingContext2D, image: HTMLImageElement, x: number, y: number, width: number, height: number, angle: number) => {
-  const TO_RADIANS = Math.PI / 180;
-
-  // コンテキストを保存する
-  context.save();
-  // 回転の中心に原点を移動する
-  context.translate(x, y);
-  // canvasを回転する
-  context.rotate(angle * TO_RADIANS);
-  // 画像サイズの半分だけずらして画像を描画する
-  context.drawImage(image, -(width / 2), -(height / 2), width, height);
-  // コンテキストを元に戻す
-  context.restore();
-};
-
-/**
- * 回転させたテキストをcanvasに表示する
- * @param text - テキスト
- * @param x - 画像の中心となるX座標
- * @param y - 画像の中心となるY座標
- * @param angle - 回転する角度[度]
- */
-const drawRotatedText = (context: CanvasRenderingContext2D, text: string, x: number, y: number, angle: number, fontSize: number) => {
-  const TO_RADIANS = Math.PI / 180;
-
-  // コンテキストを保存する
-  context.save();
-  // 回転の中心に原点を移動する
-  context.translate(x, y);
-  // canvasを回転する
-  context.rotate(angle * TO_RADIANS);
-  // 画像サイズの半分だけずらして画像を描画する
-  context.font = 'bold ' + fontSize + 'px Arial, meiryo, sans-serif';
-  const textWidth = context.measureText(text).width;
-
-  context.fillStyle = 'black';
-  // context.fillText(text, 0, 0);
-  context.fillText(text, -(textWidth / 2), fontSize);
-  // コンテキストを元に戻す
-  context.restore();
-};
-
 const loadImage = async (image: HTMLImageElement) => {
   await new Promise<void>((resolve) => {
     image.onload = () => {
@@ -94,32 +80,7 @@ const loadImage = async (image: HTMLImageElement) => {
   });
 };
 
-// const loadImages = async (images: HTMLImageElement[]) => {
-//   const loadtask: Promise<void>[] = images.map((image) => loadImage(image));
-//   console.log('tasks');
-//   return Promise.all(loadtask);
-// };
-
-const canvas2Blob = async (canvas: HTMLCanvasElement, type?: string, quality?: number): Promise<Blob> => {
-  const imageType = type ?? 'image/png';
-  const imageQuality = quality ?? 0.9;
-
-  return new Promise((resolve) => {
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          resolve(blob);
-        } else {
-          throw 'canvasがblobにできなかった';
-        }
-      },
-      imageType,
-      imageQuality,
-    );
-  });
-};
-
-export const createA4PrintImage = async (config: Config, hairStyle: string, bangs: string, hairColor: string): Promise<void> => {
+export const createImage = async (config: Config, hairStyle: string, bangs: string, hairColor: string): Promise<void> => {
   const canvas1 = document.getElementById('mychara1') as HTMLCanvasElement;
   const canvas2 = document.getElementById('mychara2') as HTMLCanvasElement;
   createCanvas(canvas1, config, hairStyle, hairColor);
@@ -157,7 +118,7 @@ const createCanvas = async (canvas: HTMLCanvasElement, config: Config, hairStyle
   let b = 92;
   for (let i = 0; i < imageData.width * imageData.height; i++) {
     if (Math.abs(imageData.data[i * 4] - r) < 30 && Math.abs(imageData.data[i * 4 + 1] - g) < 30 && Math.abs(imageData.data[i * 4 + 2] - b) < 30) {
-      imageData.data[i * 4 + 3] = 0;
+      // imageData.data[i * 4 + 3] = 0;
       color1List.push(i);
     }
   }
@@ -169,7 +130,7 @@ const createCanvas = async (canvas: HTMLCanvasElement, config: Config, hairStyle
   b = 54;
   for (let i = 0; i < imageData.width * imageData.height; i++) {
     if (Math.abs(imageData.data[i * 4] - r) < 30 && Math.abs(imageData.data[i * 4 + 1] - g) < 30 && Math.abs(imageData.data[i * 4 + 2] - b) < 30) {
-      imageData.data[i * 4 + 3] = 0;
+      // imageData.data[i * 4 + 3] = 0;
       color2List.push(i);
     }
   }

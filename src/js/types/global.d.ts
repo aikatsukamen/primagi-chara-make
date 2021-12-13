@@ -25,5 +25,4 @@ export type PartsData = {
 export type Part = {
   name: string;
   img: string;
-  description: string;
 };

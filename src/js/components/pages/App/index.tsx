@@ -1,7 +1,7 @@
 import React from 'react';
 import { Config, PartsData, Part } from '../../../types/global';
 import { Waypoint } from 'react-waypoint';
-import { createA4PrintImage } from '../../../common/util';
+import { createImage, partsJsonToTool } from '../../../common/util';
 
 /** Jsonファイルを取得 */
 async function fetchJson<T>(url: string): Promise<T> {
@@ -31,9 +31,9 @@ const App: React.FC = () => {
   })();
 
   // 選択中の情報
-  const [selectHairStyle, setselectHairStyle] = React.useState<Part>({ name: '', img: '', description: '' });
-  const [selectHairColor, setselectHairColor] = React.useState<Part>({ name: '', img: '', description: '' });
-  const [selectBang, setselectBang] = React.useState<Part>({ name: '', img: '', description: '' });
+  const [selectHairStyle, setselectHairStyle] = React.useState<Part>({ name: '', img: '' });
+  const [selectHairColor, setselectHairColor] = React.useState<Part>({ name: '', img: '' });
+  const [selectBang, setselectBang] = React.useState<Part>({ name: '', img: '' });
 
   const clickHairStyle = (item: Part) => () => {
     console.log('ポチッ');
@@ -44,26 +44,47 @@ const App: React.FC = () => {
   const fetchCardList = async () => {
     const time = new Date().getTime();
 
-    let file = `./config.json?t=${time}`;
+    const file = `./config.json?t=${time}`;
     const config = await fetchJson<Config>(file);
     setConfig(config);
 
-    file = `./parts.json?t=${time}`;
-    const parts = await fetchJson<PartsData>(file);
-    setParts(parts);
-    setBangs(objectCopy(parts.bangs));
-    setHairStyle(objectCopy(parts.hairStyle));
-    sethaircolor(objectCopy(parts.hairColor));
+    try {
+      const parts = localStorage.getItem('parts');
+      if (parts) {
+        const json = JSON.parse(parts);
+        const list: PartsData = partsJsonToTool(json);
+        setParts(list);
+        setBangs(objectCopy(list.bangs));
+        setHairStyle(objectCopy(list.hairStyle));
+        sethaircolor(objectCopy(list.hairColor));
+      }
+    } catch (e) {
+      // 無いらしい
+    }
+
+    try {
+      const partsUrl = 'https://cdnprimagiimg01.blob.core.windows.net/primagi/assets/data/parts.json';
+      const json = await fetchJson<any[]>(config.api.ajax + partsUrl);
+      const parts = partsJsonToTool(json);
+      if (parts && Array.isArray(parts.bangs) && Array.isArray(parts.hairStyle) && Array.isArray(parts.hairColor)) {
+        setParts(parts);
+        setBangs(objectCopy(parts.bangs));
+        setHairStyle(objectCopy(parts.hairStyle));
+        sethaircolor(objectCopy(parts.hairColor));
+      }
+    } catch (e) {
+      //
+    }
   };
 
   React.useEffect(() => {
     fetchCardList().then(() => {
-      createA4PrintImage(config as Config, selectHairStyle.img, selectBang.img, selectHairColor.img);
+      createImage(config as Config, selectHairStyle.img, selectBang.img, selectHairColor.img);
     });
   }, []);
 
   React.useEffect(() => {
-    createA4PrintImage(config as Config, selectHairStyle.img, selectBang.img, selectHairColor.img);
+    createImage(config as Config, selectHairStyle.img, selectBang.img, selectHairColor.img);
   }, [selectHairColor, selectHairStyle, selectBang]);
 
   const hairStyleComponent = () => {
